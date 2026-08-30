@@ -30,7 +30,10 @@ test('homepage and article layout remain inside the viewport', async ({ page }, 
   await page.goto(postURL!)
   await page.evaluate(() => document.fonts.ready)
   await page.addStyleTag({
-    content: '*, *::before, *::after { animation: none !important; transition: none !important; }',
+    content: `
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      #post-date, #post-content > * { opacity: 1 !important; transform: none !important; }
+    `,
   })
 
   await expect(page.locator('.post-title')).toBeVisible()
@@ -89,19 +92,19 @@ test('homepage and article layout remain inside the viewport', async ({ page }, 
 test('article language alternates point to real translations', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'layout-1440', 'SEO metadata only needs one browser project')
 
-  await page.goto('/posts/attention-and-finitude/')
+  await page.goto('/posts/welcome-to-pelagic/')
   const metadata = await page.locator('link[rel="alternate"][hreflang]').evaluateAll(links => links.map(link => ({
     href: (link as HTMLLinkElement).href,
     lang: link.getAttribute('hreflang'),
   })))
 
   expect(metadata).toEqual([
-    { href: 'https://example.com/posts/attention-and-finitude/', lang: 'en' },
-    { href: 'https://example.com/zh/posts/attention-and-finitude/', lang: 'zh' },
-    { href: 'https://example.com/posts/attention-and-finitude/', lang: 'x-default' },
+    { href: 'https://example.com/posts/welcome-to-pelagic/', lang: 'en' },
+    { href: 'https://example.com/zh/posts/welcome-to-pelagic/', lang: 'zh' },
+    { href: 'https://example.com/posts/welcome-to-pelagic/', lang: 'x-default' },
   ])
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://example.com/posts/attention-and-finitude/',
+    'https://example.com/posts/welcome-to-pelagic/',
   )
 })

@@ -29,14 +29,23 @@ interface Props {
 
 const { postTitle, postDescription, postSlug, supportedLangs = [] } = Astro.props
 const { isPost } = getPageInfo(Astro.url.pathname)
-const fontStyle = themeConfig.global.fontStyle === 'serif' ? 'font-serif' : 'font-sans'
-const MarginBottom = isPost && themeConfig.comment.enabled
+const fontStyle = themeConfig.typography.interfaceStyle === 'serif' ? 'font-serif' : 'font-sans'
+const MarginBottom = isPost && themeConfig.comments.enabled
   ? 'mb-18' // Post page with comment and bottom navigation
   : 'mb-12' // Other pages without comment
+const { articleWidth, tocWidth, tocGap, desktopShift, topBarInset } = themeConfig.layout
+const layoutVariables = [
+  `--post-width: ${articleWidth}`,
+  `--post-toc-width: ${tocWidth}`,
+  `--post-toc-gap: ${tocGap}`,
+  `--post-layout-shift: ${desktopShift}`,
+  `--post-topbar-inset: ${topBarInset}`,
+].join('; ')
 ---
 
 <html
   lang={Astro.currentLocale}
+  style={layoutVariables}
   class:list={[
     fontStyle,
     isPost ? 'scroll-smooth' : '',

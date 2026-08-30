@@ -21,7 +21,10 @@ const currentUI = ui[currentLang as keyof typeof ui] ?? {}
 // Site Configuration
 const { title, subtitle, description, i18nTitle, author, favicon } = themeConfig.site
 const { mode: defaultMode, light: { background: lightMode }, dark: { background: darkMode } } = themeConfig.color
-const { katex: katexEnabled, reduceMotion } = themeConfig.global
+const { katex: katexEnabled, reduceMotion } = themeConfig.features
+const faviconURL = /^(?:https?:)?\/\//.test(favicon)
+  ? favicon
+  : `${base}/${favicon.replace(/^\/+/, '')}`
 
 // Site Metadata
 const metaTheme = defaultMode === 'dark' ? darkMode : lightMode
@@ -66,9 +69,9 @@ const localizedAtom = new URL(
 <!-- Basic Info -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-{favicon.toLowerCase().endsWith('.svg') && <link rel="icon" type="image/svg+xml" href={`${base}${favicon}`} />}
-{favicon.toLowerCase().endsWith('.png') && <link rel="icon" type="image/png" href={`${base}${favicon}`} />}
-{favicon.toLowerCase().endsWith('.ico') && <link rel="icon" type="image/x-icon" href={`${base}${favicon}`} />}
+{favicon.toLowerCase().endsWith('.svg') && <link rel="icon" type="image/svg+xml" href={faviconURL} />}
+{favicon.toLowerCase().endsWith('.png') && <link rel="icon" type="image/png" href={faviconURL} />}
+{favicon.toLowerCase().endsWith('.ico') && <link rel="icon" type="image/x-icon" href={faviconURL} />}
 <link rel="apple-touch-icon" sizes="180x180" href={`${base}/apple-touch-icon.png`} />
 <title>{pageTitle}</title>
 <meta name="description" content={pageDescription} />

@@ -3,7 +3,7 @@ import type { ThemeConfig } from '@/types'
 import { themeConfig } from '@/config'
 import { isPostPage } from '@/utils/page'
 
-type DateFormat = ThemeConfig['global']['dateFormat']
+type DateFormat = ThemeConfig['features']['dateFormat']
 
 interface Props {
   date: Date
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const { date, updatedDate, minutes } = Astro.props
-const { dateFormat: format } = themeConfig.global
+const { dateFormat: format } = themeConfig.features
 const isPost = isPostPage(Astro.url.pathname)
 const timeSpacingClass = isPost ? 'ml-1.75' : 'ml-1.5'
 

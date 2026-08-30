@@ -33,22 +33,33 @@ export interface ThemeConfig {
       highlight: string
     }
   }
-  global: {
-    locale: Language
-    moreLocales: Language[]
-    fontStyle: 'sans' | 'serif'
+  locale: {
+    default: Language
+    additional: Language[]
+  }
+  typography: {
+    interfaceStyle: 'sans' | 'serif'
     postBodyFont: 'garamond' | 'sans'
     postBodyFontSize: {
       garamond: number
       sans: number
     }
     postBodyAuxFontSize: number
+  }
+  layout: {
+    articleWidth: string
+    tocWidth: string
+    tocGap: string
+    desktopShift: string
+    topBarInset: string
+  }
+  features: {
     dateFormat: 'YYYY-MM-DD' | 'MM-DD-YYYY' | 'DD-MM-YYYY' | 'MMM D YYYY' | 'D MMM YYYY'
     toc: boolean
     katex: boolean
     reduceMotion: boolean
   }
-  comment: {
+  comments: {
     enabled: boolean
     giscus?: {
       repo?: string

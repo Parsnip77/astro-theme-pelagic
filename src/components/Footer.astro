@@ -38,6 +38,13 @@ const socialLinks = links.map(({ name, url }) => {
     }
   }
 
+  if (url.startsWith('/')) {
+    return {
+      name,
+      href: getLocalizedPath(url, currentLang),
+    }
+  }
+
   return {
     name,
     href: url,
@@ -65,6 +72,6 @@ const socialLinks = links.map(({ name, url }) => {
   </p>
 
   <p>
-    Powered by <a class="highlight-hover py-0.8 transition-colors after:bottom-0.35em hover:c-primary" href="https://astro.build/" target="_blank" rel="noopener noreferrer">Astro</a> and <a class="highlight-hover py-0.8 transition-colors after:bottom-0.35em hover:c-primary" href="https://github.com/radishzzz/astro-theme-retypeset" target="_blank" rel="noopener noreferrer">Retypeset</a>
+    Powered by <a class="highlight-hover py-0.8 transition-colors after:bottom-0.35em hover:c-primary" href="https://astro.build/" target="_blank" rel="noopener noreferrer">Astro</a> and <a class="highlight-hover py-0.8 transition-colors after:bottom-0.35em hover:c-primary" href="https://github.com/Parsnip77/astro-theme-pelagic" target="_blank" rel="noopener noreferrer">Pelagic</a>
   </p>
 </footer>

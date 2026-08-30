@@ -1,12 +1,11 @@
 html {
   --at-apply: 'bg-background c-secondary antialiased';
-  --post-column-half-width: 25rem;
-  /* Half of the 50rem article + 4.5rem gap + 16rem TOC desktop group. */
-  --post-layout-half-width: 35.25rem;
+  --post-width: 50rem;
+  --post-toc-width: 16rem;
+  --post-toc-gap: 4.5rem;
+  --post-layout-half-width: calc((var(--post-width) + var(--post-toc-gap) + var(--post-toc-width)) / 2);
   /* Positive values move the article+TOC group right, while the article remains left of viewport center. */
   --post-layout-shift: 6rem;
-  --post-toc-gap: 4.5rem;
-  --post-toc-width: 16rem;
   --post-topbar-inset: max(2rem, 5vw);
   --toc-accent: oklch(0.61 0.17 248);
   scrollbar-width: thin;
@@ -104,7 +103,7 @@ html.dark .code-copy-button.copied {
 }
 /* Article pages use a wide reading column; desktop TOC geometry is applied below. */
 .post-page-shell {
-  max-width: calc(var(--post-column-half-width) + var(--post-column-half-width));
+  max-width: var(--post-width);
   margin-inline: auto;
 }
 .post-topbar-spacer {

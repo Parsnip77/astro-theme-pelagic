@@ -1,14 +1,15 @@
 import type { APIRoute } from 'astro'
+import { base } from '@/config'
 
 export const GET: APIRoute = ({ site }) => {
-  const sitemapURL = new URL('sitemap-index.xml', site)
+  const sitemapURL = new URL(`${base}/sitemap-index.xml`, site)
 
-  const robotsTxt = [
+  const robotsTxt = `${[
     'User-agent: *',
     'Allow: /',
     '',
     `Sitemap: ${sitemapURL.href}`,
-  ].join('\n')
+  ].join('\n')}\n`
 
   return new Response(robotsTxt, {
     headers: {

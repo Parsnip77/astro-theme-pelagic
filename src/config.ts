@@ -1,33 +1,81 @@
 import type { ThemeConfig } from '@/types'
+import process from 'node:process'
 
+function normalizeBasePath(value: string) {
+  const trimmed = value.trim()
+  if (!trimmed || trimmed === '/') {
+    return '/'
+  }
+  return `/${trimmed.replace(/^\/+|\/+$/g, '')}`
+}
+
+function resolveDeployment() {
+  const explicitSiteURL = process.env.SITE_URL?.trim()
+  const explicitBasePath = process.env.BASE_PATH?.trim()
+  const [repositoryOwner, repositoryName] = (process.env.GITHUB_REPOSITORY ?? '').split('/')
+  const isGitHubActions = process.env.GITHUB_ACTIONS === 'true'
+
+  // Project Pages can infer their public origin and repository subpath.
+  // Local builds deliberately use example.com until the owner configures a URL.
+  const url = explicitSiteURL
+    || (isGitHubActions && repositoryOwner
+      ? `https://${repositoryOwner}.github.io`
+      : 'https://example.com')
+
+  const inferredBase = isGitHubActions
+    && repositoryOwner
+    && repositoryName
+    && repositoryName !== `${repositoryOwner}.github.io`
+    ? `/${repositoryName}`
+    : '/'
+
+  // An explicit SITE_URL normally means a root deployment or custom domain.
+  // Set BASE_PATH as well when deploying beneath a subdirectory on that origin.
+  const base = normalizeBasePath(
+    explicitBasePath || (explicitSiteURL ? '/' : inferredBase),
+  )
+
+  const parsedURL = new URL(url)
+  if (!['http:', 'https:'].includes(parsedURL.protocol)) {
+    throw new Error('[Pelagic config] SITE_URL must use http or https.')
+  }
+  if (parsedURL.pathname !== '/' || parsedURL.search || parsedURL.hash) {
+    throw new Error('[Pelagic config] SITE_URL must be an origin without a path, query, or hash. Use BASE_PATH for a subdirectory.')
+  }
+
+  return {
+    base,
+    url: parsedURL.origin,
+  }
+}
+
+const deployment = resolveDeployment()
+
+/**
+ * Pelagic's main public configuration.
+ *
+ * Environment variables override deployment-only values:
+ *   SITE_URL=https://blog.example.com
+ *   BASE_PATH=/notes
+ *
+ * See docs/configuration.md for every option and docs/deployment.md for hosts.
+ */
 export const themeConfig: ThemeConfig = {
-  // SITE INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START
   site: {
-    // site title
     title: 'Pelagic',
-    // site subtitle
     subtitle: 'Notes, Essays & Research',
-    // site description
-    description: 'Pelagic | A typography-first Astro blog theme',
-    // use i18n title/subtitle/description from src/i18n/ui.ts instead of static ones above
-    i18nTitle: true, // true | false
-    // author name
-    author: 'Site Author',
-    // site url
-    url: 'https://example.com/',
-    // base path
-    // root directory for all pages and assets
-    base: '/', // e.g., '/blog', '/docs'
-    // favicon url
-    // recommended formats: svg, png or ico
-    favicon: '/favicon.svg', // or https://example.com/favicon.svg
-  },
-  // SITE INFORMATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END
+    description: 'A typography-first multilingual blog built with Pelagic and Astro.',
+    author: 'Your Name',
+    url: deployment.url,
+    base: deployment.base,
+    favicon: '/favicon.svg',
 
-  // COLOR SETTINGS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START
+    // When true, title/subtitle/description come from src/i18n/ui.ts.
+    i18nTitle: true,
+  },
+
   color: {
-    // default theme mode
-    mode: 'light', // light | dark | auto
+    mode: 'auto', // light | dark | auto
     light: {
       primary: 'oklch(0.24 0.0172 280.05)',
       secondary: 'oklch(0.40 0.0172 280.05)',
@@ -41,42 +89,41 @@ export const themeConfig: ThemeConfig = {
       highlight: 'oklch(0.72 0.18 248 / 0.26)',
     },
   },
-  // COLOR SETTINGS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END
 
-  // GLOBAL SETTINGS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START
-  global: {
-    // default language; do not repeat it in moreLocales
-    locale: 'en', // de | en | es | fr | ja | ko | pl | pt | ru | zh | zh-tw
-    // more languages
-    // not fill in the locale code above again, can be an empty array []
-    moreLocales: ['zh'], // ['de', 'en', 'es', 'fr', 'ja', 'ko', 'pl', 'pt', 'ru', 'zh', 'zh-tw']
-    // post font style
-    fontStyle: 'sans', // sans | serif
-    // default post body typography; individual posts can override both values in front matter
+  locale: {
+    default: 'en',
+    additional: ['zh'],
+  },
+
+  typography: {
+    interfaceStyle: 'sans', // sans | serif
     postBodyFont: 'garamond', // garamond | sans
     postBodyFontSize: {
-      garamond: 18, // recommended visual match for EB Garamond
-      sans: 16, // recommended visual match for the original sans-serif stack
+      garamond: 18,
+      sans: 16,
     },
-    // Base size for CJK fallback glyphs, math and code inside Garamond posts
+    // Size for CJK fallback glyphs, inline code, code blocks, and math in Garamond posts.
     postBodyAuxFontSize: 16,
-    // post date format
-    dateFormat: 'YYYY-MM-DD', // YYYY-MM-DD | MM-DD-YYYY | DD-MM-YYYY | MMM D YYYY | D MMM YYYY
-    // enable table of contents
-    toc: true, // true | false
-    // enable katex math rendering
-    katex: true, // true | false
-    // reduce motion
-    reduceMotion: false, // true | false
   },
-  // GLOBAL SETTINGS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END
 
-  // COMMENT SETTINGS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START
-  comment: {
-    // enable comment system
-    enabled: false, // true | false
-    // giscus
-    // https://giscus.app/
+  layout: {
+    articleWidth: '50rem',
+    tocWidth: '16rem',
+    tocGap: '4.5rem',
+    // Positive values move the article/TOC group to the right on wide screens.
+    desktopShift: '6rem',
+    topBarInset: 'max(2rem, 5vw)',
+  },
+
+  features: {
+    dateFormat: 'YYYY-MM-DD',
+    toc: true,
+    katex: true,
+    reduceMotion: false,
+  },
+
+  comments: {
+    enabled: false,
     giscus: {
       repo: '',
       repoId: '',
@@ -89,40 +136,39 @@ export const themeConfig: ThemeConfig = {
       inputPosition: 'bottom',
     },
   },
-  // COMMENT SETTINGS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END
 
-  // FOOTER SETTINGS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> START
   footer: {
-    // social links
     links: [
-      // {
-      //  name: 'RSS',
-      //  url: '/rss.xml', // or /rss.xml
-      // },
-      {
-        name: 'GitHub',
-        url: 'https://github.com/Parsnip77/astro-theme-pelagic',
-      },
-      {
-        name: 'RSS',
-        url: '/rss.xml',
-      },
+      { name: 'GitHub', url: 'https://github.com/Parsnip77/astro-theme-pelagic' },
+      { name: 'RSS', url: '/rss.xml' },
     ],
-    // year of website start
     startYear: 2026,
   },
-  // FOOTER SETTINGS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END
-
 }
 
-export const base = themeConfig.site.base === '/' ? '' : themeConfig.site.base.replace(/\/$/, '')
-export const defaultLocale = themeConfig.global.locale
-export const moreLocales = themeConfig.global.moreLocales
+export const base = themeConfig.site.base === '/' ? '' : themeConfig.site.base
+export const defaultLocale = themeConfig.locale.default
+export const moreLocales = themeConfig.locale.additional
+export const allLocales = [defaultLocale, ...moreLocales]
 
 if (moreLocales.includes(defaultLocale)) {
   throw new Error(
-    `[Blog config] global.moreLocales must not include the default locale "${defaultLocale}".`,
+    `[Pelagic config] locale.additional must not include the default locale "${defaultLocale}".`,
   )
 }
 
-export const allLocales = [defaultLocale, ...moreLocales]
+if (new Set(moreLocales).size !== moreLocales.length) {
+  throw new Error('[Pelagic config] locale.additional must not contain duplicates.')
+}
+
+if (themeConfig.comments.enabled) {
+  const requiredGiscusFields = ['repo', 'repoId', 'category', 'categoryId'] as const
+  const missingFields = requiredGiscusFields.filter(
+    field => !themeConfig.comments.giscus?.[field]?.trim(),
+  )
+  if (missingFields.length > 0) {
+    throw new Error(
+      `[Pelagic config] comments.enabled requires Giscus fields: ${missingFields.join(', ')}.`,
+    )
+  }
+}

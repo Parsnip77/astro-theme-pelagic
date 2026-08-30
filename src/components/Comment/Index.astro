@@ -2,9 +2,9 @@
 import Giscus from '@/components/Comment/Giscus.astro'
 import { themeConfig } from '@/config'
 
-const { enabled: enableComment } = themeConfig.comment
+const { enabled: enableComment } = themeConfig.comments
 
-const giscusRepo = themeConfig.comment.giscus?.repo ?? ''
+const giscusRepo = themeConfig.comments.giscus?.repo ?? ''
 const showGiscus = enableComment && Boolean(giscusRepo.trim())
 ---
 

@@ -118,7 +118,7 @@ export async function generateFeed({ lang }: { lang?: Language } = {}) {
     description: i18nTitle ? currentUI.description : description,
     id: siteURL,
     link: siteURL,
-    language: lang ?? themeConfig.global.locale,
+    language: lang ?? themeConfig.locale.default,
     copyright: `Copyright © ${new Date().getFullYear()} ${author}`,
     updated: new Date(),
     generator: 'Pelagic with Astro and Feed for Node.js',

@@ -118,12 +118,27 @@ async function validateDraftIsolation() {
   }
 }
 
+async function validateRobots() {
+  const robotsPath = path.join(distDir, 'robots.txt')
+  if (!await exists(robotsPath)) {
+    report('robots.txt', 'file was not generated')
+    return
+  }
+
+  const robots = await fs.readFile(robotsPath, 'utf8')
+  const expectedSitemap = new URL(`${base}/sitemap-index.xml`, themeConfig.site.url).href
+  if (!robots.split(/\r?\n/).includes(`Sitemap: ${expectedSitemap}`)) {
+    report('robots.txt', `expected sitemap URL: ${expectedSitemap}`)
+  }
+}
+
 async function main() {
   const htmlFiles = await glob('**/*.html', { cwd: distDir })
   for (const file of htmlFiles) {
     await validateHTML(file)
   }
   await validateDraftIsolation()
+  await validateRobots()
 
   if (diagnostics.length > 0) {
     console.error(`Build validation failed with ${diagnostics.length} issue(s):`)

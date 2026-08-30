@@ -6,7 +6,7 @@ import { themeConfig } from '@/config'
 import { langMap } from '@/i18n/config'
 
 // Content may contain translations that are not currently enabled for routing.
-// `themeConfig.global.moreLocales` controls generated pages, not valid front matter.
+// `themeConfig.locale.additional` controls generated pages, not valid front matter.
 const contentLocales = Object.keys(langMap) as [Language, ...Language[]]
 
 const posts = defineCollection({
@@ -25,7 +25,7 @@ const posts = defineCollection({
     // Advanced
     draft: z.boolean().optional().default(false),
     pin: z.number().int().min(0).max(99).optional().default(0),
-    toc: z.boolean().optional().default(themeConfig.global.toc),
+    toc: z.boolean().optional().default(themeConfig.features.toc),
     bodyFont: z.enum(['garamond', 'sans']).optional(),
     bodyFontSize: z.number().min(14).max(24).optional(),
     bodyAuxFontSize: z.number().min(12).max(24).optional(),

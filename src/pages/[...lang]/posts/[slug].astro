@@ -6,7 +6,7 @@ import Comment from '@/components/Comment/Index.astro'
 import PostDate from '@/components/PostDate.astro'
 import TagList from '@/components/TagList.astro'
 import TOC from '@/components/Widgets/TOC.astro'
-import { allLocales, themeConfig } from '@/config'
+import { allLocales, base, themeConfig } from '@/config'
 import { getLangFromLocale, getLangRouteParam } from '@/i18n/lang'
 import Layout from '@/layouts/Layout.astro'
 import { checkPostSlugDuplication } from '@/utils/content'
@@ -78,15 +78,15 @@ const { post, supportedLangs } = Astro.props
 const currentLang = getLangFromLocale(Astro.currentLocale)
 const slug = post.data.abbrlink || post.id
 const description = getPostDescription(post, 'meta')
-const bodyFont = post.data.bodyFont ?? themeConfig.global.postBodyFont
-const bodyFontSize = post.data.bodyFontSize ?? themeConfig.global.postBodyFontSize[bodyFont]
-const bodyAuxFontSize = post.data.bodyAuxFontSize ?? themeConfig.global.postBodyAuxFontSize
+const bodyFont = post.data.bodyFont ?? themeConfig.typography.postBodyFont
+const bodyFontSize = post.data.bodyFontSize ?? themeConfig.typography.postBodyFontSize[bodyFont]
+const bodyAuxFontSize = post.data.bodyAuxFontSize ?? themeConfig.typography.postBodyAuxFontSize
 const garamondSizeAdjust = ((bodyFontSize / bodyAuxFontSize) * 100).toFixed(4)
 const adjustedGaramondCSS = bodyFont === 'garamond'
   ? `
 @font-face {
   font-family: "EB Garamond Post";
-  src: url("/fonts/EBGaramond/EBGaramond-LatinExt.woff2") format("woff2");
+  src: url("${base}/fonts/EBGaramond/EBGaramond-LatinExt.woff2") format("woff2");
   font-display: swap;
   font-style: normal;
   font-weight: 400 800;
@@ -95,7 +95,7 @@ const adjustedGaramondCSS = bodyFont === 'garamond'
 }
 @font-face {
   font-family: "EB Garamond Post";
-  src: url("/fonts/EBGaramond/EBGaramond-Latin.woff2") format("woff2");
+  src: url("${base}/fonts/EBGaramond/EBGaramond-Latin.woff2") format("woff2");
   font-display: swap;
   font-style: normal;
   font-weight: 400 800;
@@ -104,7 +104,7 @@ const adjustedGaramondCSS = bodyFont === 'garamond'
 }
 @font-face {
   font-family: "EB Garamond Post";
-  src: url("/fonts/EBGaramond/EBGaramond-Italic-LatinExt.woff2") format("woff2");
+  src: url("${base}/fonts/EBGaramond/EBGaramond-Italic-LatinExt.woff2") format("woff2");
   font-display: swap;
   font-style: italic;
   font-weight: 400 800;
@@ -113,7 +113,7 @@ const adjustedGaramondCSS = bodyFont === 'garamond'
 }
 @font-face {
   font-family: "EB Garamond Post";
-  src: url("/fonts/EBGaramond/EBGaramond-Italic-Latin.woff2") format("woff2");
+  src: url("${base}/fonts/EBGaramond/EBGaramond-Italic-Latin.woff2") format("woff2");
   font-display: swap;
   font-style: italic;
   font-weight: 400 800;

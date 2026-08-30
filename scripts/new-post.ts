@@ -39,11 +39,11 @@ tags:
   - Tag
 draft: true
 pin: 0
-toc: ${themeConfig.global.toc}
-bodyFont: ${themeConfig.global.postBodyFont}
-bodyFontSize: ${themeConfig.global.postBodyFontSize[themeConfig.global.postBodyFont]}
-bodyAuxFontSize: ${themeConfig.global.postBodyAuxFontSize}
-lang: ${themeConfig.global.locale}
+toc: ${themeConfig.features.toc}
+bodyFont: ${themeConfig.typography.postBodyFont}
+bodyFontSize: ${themeConfig.typography.postBodyFontSize[themeConfig.typography.postBodyFont]}
+bodyAuxFontSize: ${themeConfig.typography.postBodyAuxFontSize}
+lang: ${themeConfig.locale.default}
 abbrlink: ${defaultSlug}
 ---
 `

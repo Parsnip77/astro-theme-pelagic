@@ -2,8 +2,23 @@
   "name": "astro-theme-pelagic",
   "type": "module",
   "version": "0.1.0",
+  "private": true,
   "packageManager": "pnpm@11.24.0",
+  "description": "A typography-first multilingual Astro blog theme.",
+  "license": "MIT",
+  "homepage": "https://github.com/Parsnip77/astro-theme-pelagic",
   "repository": "https://github.com/Parsnip77/astro-theme-pelagic",
+  "bugs": "https://github.com/Parsnip77/astro-theme-pelagic/issues",
+  "keywords": [
+    "astro",
+    "blog",
+    "theme",
+    "typography",
+    "multilingual"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "astro dev",
     "check": "astro check",

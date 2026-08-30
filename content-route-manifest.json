@@ -3,19 +3,19 @@
   "routes": [
     {
       "lang": "en",
-      "slug": "attention-and-finitude"
+      "slug": "welcome-to-pelagic"
     },
     {
       "lang": "zh",
-      "slug": "attention-and-finitude"
+      "slug": "welcome-to-pelagic"
     },
     {
       "lang": "en",
-      "slug": "spectral-graph-diffusion"
+      "slug": "writing-showcase"
     },
     {
       "lang": "zh",
-      "slug": "spectral-graph-diffusion"
+      "slug": "writing-showcase"
     }
   ]
 }
