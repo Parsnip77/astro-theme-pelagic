@@ -1,7 +1,9 @@
 import process from 'node:process'
 import { defineConfig } from '@playwright/test'
+import { base } from './src/config'
 
 const viewports = [390, 1280, 1440, 1920]
+const previewURL = `http://127.0.0.1:4321${base}/`
 
 export default defineConfig({
   testDir: './tests',
@@ -13,7 +15,7 @@ export default defineConfig({
     ? [['line'], ['html', { open: 'never', outputFolder: 'artifacts/playwright-report' }]]
     : 'line',
   use: {
-    baseURL: 'http://127.0.0.1:4321',
+    baseURL: previewURL,
     browserName: 'chromium',
     colorScheme: 'light',
     locale: 'en-US',
@@ -28,6 +30,6 @@ export default defineConfig({
     command: 'pnpm preview --host 127.0.0.1 --port 4321',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    url: 'http://127.0.0.1:4321/',
+    url: previewURL,
   },
 })

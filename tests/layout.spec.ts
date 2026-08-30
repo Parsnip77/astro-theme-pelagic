@@ -1,4 +1,13 @@
 import { expect, test } from '@playwright/test'
+import { base, themeConfig } from '../src/config'
+
+function appPath(pathname: string) {
+  return `${base}${pathname}`
+}
+
+function publicURL(pathname: string) {
+  return new URL(appPath(pathname), themeConfig.site.url).href
+}
 
 test.beforeEach(async ({ page }) => {
   await page.route(/https:\/\/(?:api\.github\.com|giscus\.app|platform\.twitter\.com)\//, route => route.abort())
@@ -7,7 +16,7 @@ test.beforeEach(async ({ page }) => {
 test('homepage and article layout remain inside the viewport', async ({ page }, testInfo) => {
   const width = testInfo.project.use.viewport?.width ?? 0
 
-  await page.goto('/')
+  await page.goto(appPath('/'))
   await page.evaluate(() => document.fonts.ready)
   await expect(page.locator('main')).toBeVisible()
 
@@ -92,19 +101,19 @@ test('homepage and article layout remain inside the viewport', async ({ page }, 
 test('article language alternates point to real translations', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'layout-1440', 'SEO metadata only needs one browser project')
 
-  await page.goto('/posts/welcome-to-pelagic/')
+  await page.goto(appPath('/posts/welcome-to-pelagic/'))
   const metadata = await page.locator('link[rel="alternate"][hreflang]').evaluateAll(links => links.map(link => ({
     href: (link as HTMLLinkElement).href,
     lang: link.getAttribute('hreflang'),
   })))
 
   expect(metadata).toEqual([
-    { href: 'https://example.com/posts/welcome-to-pelagic/', lang: 'en' },
-    { href: 'https://example.com/zh/posts/welcome-to-pelagic/', lang: 'zh' },
-    { href: 'https://example.com/posts/welcome-to-pelagic/', lang: 'x-default' },
+    { href: publicURL('/posts/welcome-to-pelagic/'), lang: 'en' },
+    { href: publicURL('/zh/posts/welcome-to-pelagic/'), lang: 'zh' },
+    { href: publicURL('/posts/welcome-to-pelagic/'), lang: 'x-default' },
   ])
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://example.com/posts/welcome-to-pelagic/',
+    publicURL('/posts/welcome-to-pelagic/'),
   )
 })
