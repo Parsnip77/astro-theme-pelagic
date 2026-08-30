@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Lint, build, and layout regression
+    name: Lint, build, layout, and deployment regression
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -39,7 +39,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Verify source and generated site
-        run: pnpm verify
+        run: pnpm verify:release
 
       - name: Upload layout screenshots and traces
         if: always()

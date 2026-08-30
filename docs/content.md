@@ -2,6 +2,8 @@
 
 Posts live in `src/content/posts/` and About pages live in `src/content/about/`. Both Markdown (`.md`) and MDX (`.mdx`) are supported.
 
+[简体中文](zh-CN/content.md)
+
 ## Create a draft
 
 ```bash
@@ -128,5 +130,5 @@ Tables use intrinsic column widths and horizontal scrolling. This keeps code, fo
 1. Change `draft` to `false`.
 2. Fill `description`, `lang`, and `abbrlink`.
 3. Run `pnpm content:manifest` if the route set changed intentionally.
-4. Run `pnpm verify`.
+4. Run `pnpm verify` (or `pnpm verify:release` before a public release).
 5. Commit the post, local images, and updated route manifest together.

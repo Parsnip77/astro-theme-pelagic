@@ -1,26 +1,41 @@
-# Pelagic
+<p align="center">
+  <img src="public/icons/pelagic-mark.svg" width="88" alt="Pelagic wave mark">
+</p>
 
-Pelagic is a typography-first, multilingual static blog theme built with [Astro](https://astro.build/) and UnoCSS. It pairs a quiet, text-only home page with a wide article column, compact navigation, and a responsive margin table of contents.
+<h1 align="center">Pelagic</h1>
 
-Pelagic is derived from [Retypeset](https://github.com/radishzzz/astro-theme-retypeset). The live design that preceded this reusable theme can be viewed at [leanderc.com](https://leanderc.com); the public defaults in this repository contain no personal configuration from that site.
+<p align="center">
+  A typography-first, multilingual Astro blog theme for essays, notes, and research.
+</p>
 
-## Highlights
+<p align="center">
+  <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="https://leanderc.com">Live demo</a>
+</p>
 
-- Static output with no database, server, analytics, or CMS requirement.
-- English and Simplified Chinese starter content, with UI translations for 11 locales.
-- EB Garamond Latin titles and optional prose, with independently sized CJK, math, and code.
-- Wide reading column and animated desktop margin TOC; compact mobile layout.
-- Markdown and MDX, KaTeX, Mermaid, syntax highlighting, callouts, folds, embeds, RSS/Atom, sitemap, and generated Open Graph images.
-- Optional Giscus comments, disabled by default.
-- Content validation, generated-site link checks, and responsive Playwright tests.
-- Automatic GitHub Pages deployment for user sites, project sites, and custom domains.
+<p align="center">
+  <a href="https://github.com/Parsnip77/astro-theme-pelagic/actions/workflows/verify.yml"><img alt="Verification status" src="https://github.com/Parsnip77/astro-theme-pelagic/actions/workflows/verify.yml/badge.svg"></a>
+  <a href="https://astro.build/"><img alt="Astro 6" src="https://img.shields.io/badge/Astro-6-BC52EE?logo=astro&logoColor=white"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/License-MIT-3B82F6"></a>
+</p>
 
-## Requirements
+![Pelagic article view](docs/images/article-desktop.jpg)
 
-- Node.js 22 or newer
-- pnpm 11 (the exact package-manager version is declared in `package.json`)
+Pelagic keeps the home page quiet and text-only, then gives long-form posts a wider reading column, fixed corner navigation, and a responsive margin table of contents. It is a reusable derivative of [Retypeset](https://github.com/radishzzz/astro-theme-retypeset); the public defaults contain no personal content from the [live design](https://leanderc.com).
+
+## Why Pelagic
+
+- Typography before decoration: EB Garamond Latin titles and optional prose, balanced CJK fallbacks, and separate sizing for math and code.
+- Long-form reading: a `50rem` article column, smooth two-level margin TOC, readable tables, and horizontally scrollable diagrams.
+- Multilingual by design: English and Simplified Chinese examples, plus interface translations for 11 locales.
+- Static and private by default: no database, CMS, analytics, remote fonts, or comments unless you enable them.
+- Rich writing surface: Markdown and MDX, KaTeX, Mermaid, syntax highlighting, callouts, folds, embeds, RSS/Atom, sitemap, and generated Open Graph images.
+- Deployment-aware: root domains, GitHub user sites, and GitHub project subpaths are handled by the same source tree.
+
+![Pelagic math, code, and Mermaid rendering](docs/images/features-desktop.jpg)
 
 ## Quick start
+
+Requirements: Node.js 22 or newer and pnpm 11.
 
 ```bash
 git clone https://github.com/Parsnip77/astro-theme-pelagic.git my-blog
@@ -29,13 +44,13 @@ pnpm install
 pnpm dev
 ```
 
-Open `http://localhost:4321`, then make these changes first:
+Open `http://localhost:4321`. Before publishing:
 
 1. Edit identity, languages, typography, layout, and links in `src/config.ts`.
-2. When `site.i18nTitle` is enabled, edit localized site text in `src/i18n/ui.ts`.
-3. Replace `src/content/about/about-en.md` and `about-zh.md`.
-4. Remove or rewrite the posts in `src/content/posts/`.
-5. Replace the favicon and social images in `public/` if desired.
+2. Edit localized site text in `src/i18n/ui.ts` when `site.i18nTitle` is enabled.
+3. Replace the About pages and sample posts under `src/content/`.
+4. Replace the favicon and social assets in `public/` if desired.
+5. Run `pnpm verify:release`.
 
 ## Write a post
 
@@ -43,7 +58,7 @@ Open `http://localhost:4321`, then make these changes first:
 pnpm new-post my-first-post
 ```
 
-The command creates a draft under `src/content/posts/` using the current default language and typography. A published post needs a non-empty `description`, explicit `lang`, and stable `abbrlink`.
+This creates a draft in `src/content/posts/`. A published post needs a description, language, and stable `abbrlink`.
 
 ```yaml
 ---
@@ -53,7 +68,6 @@ description: A concise summary for lists, feeds, and search metadata.
 tags:
   - Notes
 draft: false
-pin: 0
 toc: true
 bodyFont: garamond
 bodyFontSize: 18
@@ -63,47 +77,60 @@ abbrlink: my-first-post
 ---
 ```
 
-Translated posts should use the same `abbrlink`; Pelagic then links only the translations that actually exist.
+Translations share the same `abbrlink` and use different `lang` values. Pelagic only links translations that actually exist.
 
-## Verify and build
+## Configuration at a glance
 
-```bash
-pnpm check          # Astro and TypeScript checks
-pnpm build          # validated production build in dist/
-pnpm verify         # lint + build + responsive browser tests
-pnpm preview        # preview the latest production build
+Most owner-facing settings live in one file:
+
+```ts
+export const themeConfig = {
+  site: { title: 'Pelagic', author: 'Your Name', i18nTitle: true },
+  locale: { default: 'en', additional: ['zh'] },
+  typography: { postBodyFont: 'garamond' },
+  layout: { articleWidth: '50rem', tocWidth: '16rem' },
+  comments: { enabled: false },
+}
 ```
 
-When published URLs are intentionally added, removed, or renamed, review them and accept the new route set:
+See the [configuration reference](docs/configuration.md) for every setting and the [content guide](docs/content.md) for supported Markdown syntax.
+
+## Deploy to GitHub Pages
+
+The included workflow builds and deploys every push to `main`.
+
+1. Push the repository to GitHub.
+2. Open **Settings → Pages**.
+3. Choose **GitHub Actions** as the source.
+4. Push again or run **Deploy to GitHub Pages** manually.
+
+Pelagic automatically distinguishes `<owner>.github.io` from a project repository such as `my-blog`. Custom domains use the `SITE_URL` repository variable and `public/CNAME`. Follow the [deployment guide](docs/deployment.md) for exact scenarios.
+
+## Verification
 
 ```bash
-pnpm content:manifest
+pnpm check             # Astro and TypeScript diagnostics
+pnpm build             # production build and generated-link validation
+pnpm verify            # lint, config/docs checks, build, responsive browser tests
+pnpm verify:release    # verify plus a GitHub project-subpath build
 ```
 
-Commit `content-route-manifest.json` with the content change. This makes accidental URL deletion visible in CI.
-
-## Deploy
-
-The included `.github/workflows/deploy.yml` uses the official Astro and GitHub Pages actions. Push the repository to GitHub, open **Settings → Pages**, select **GitHub Actions** as the source, and push to `main`.
-
-- A repository named `<owner>.github.io` deploys at the root automatically.
-- Any other repository automatically uses `/<repository-name>` as its base path.
-- For a custom domain, set the repository variable `SITE_URL` and optionally `BASE_PATH`, then add `public/CNAME`.
-
-See [docs/deployment.md](docs/deployment.md) for exact scenarios and other static hosts.
+The CI suite checks content metadata and route stability, documentation references, root and subpath builds, canonical/internal URLs, draft isolation, image alternative text, and responsive layouts at 390, 1280, 1440, and 1920 pixels. Read the [testing guide](docs/testing.md) for the complete matrix.
 
 ## Documentation
 
-- [Configuration reference](docs/configuration.md)
-- [Content authoring guide](docs/content.md)
-- [Deployment guide](docs/deployment.md)
-- [Third-party assets and licenses](THIRD_PARTY_LICENSES.md)
-- [Derivative-work notices](NOTICE.md)
+| English | 简体中文 |
+| --- | --- |
+| [Configuration](docs/configuration.md) | [配置参考](docs/zh-CN/configuration.md) |
+| [Content authoring](docs/content.md) | [内容写作](docs/zh-CN/content.md) |
+| [Deployment](docs/deployment.md) | [部署指南](docs/zh-CN/deployment.md) |
+| [Testing](docs/testing.md) | [测试说明](docs/zh-CN/testing.md) |
+| [Screenshot gallery](docs/showcase.md) | [截图与效果](docs/zh-CN/showcase.md) |
 
 ## Project structure
 
 ```text
-src/config.ts             Main site, typography, layout, and feature settings
+src/config.ts             Site, typography, layout, and feature settings
 src/i18n/                 Interface translations and locale routing
 src/content/about/        Localized About pages
 src/content/posts/        Markdown and MDX posts
@@ -115,6 +142,8 @@ tests/                    Responsive layout regression tests
 .github/workflows/        Verification and GitHub Pages deployment
 ```
 
-## License
+## Credits and license
 
-Pelagic source code is available under the MIT License. The original Retypeset copyright is retained, and Pelagic modifications are copyright © 2026 Parsnip77. Bundled fonts and the Giscus theme base remain under their respective licenses. See [LICENSE](LICENSE), [NOTICE.md](NOTICE.md), and [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+Pelagic is derived from [Retypeset](https://github.com/radishzzz/astro-theme-retypeset). Source code is available under the MIT License. Original Retypeset notices are retained, and Pelagic modifications are copyright © 2026 Parsnip77. Bundled fonts and the Giscus theme base keep their respective licenses.
+
+See [LICENSE](LICENSE), [NOTICE.md](NOTICE.md), and [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).

@@ -2,6 +2,8 @@
 
 Pelagic produces a fully static site in `dist/`. Any host that can run Node.js during the build and serve static files can deploy it.
 
+[简体中文](zh-CN/deployment.md)
+
 ## Deployment variables
 
 | Variable | Example | Meaning |
@@ -83,7 +85,7 @@ SITE_URL=https://example.com BASE_PATH=/my-blog pnpm build
 pnpm preview
 ```
 
-`pnpm build` validates generated links and assets. `pnpm verify` additionally runs linting and responsive browser checks; the browser suite assumes a root local preview, so use the ordinary configuration for that command.
+`pnpm build` validates generated links and assets. `pnpm verify` additionally runs linting and responsive browser checks. `pnpm verify:release` also builds a synthetic GitHub project site and validates every generated subpath link.
 
 ## Before going live
 

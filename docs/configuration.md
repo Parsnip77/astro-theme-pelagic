@@ -2,6 +2,8 @@
 
 Pelagic keeps the settings most site owners need in `src/config.ts`. Deployment-only values can be overridden with environment variables so the same source can build for local preview, a GitHub project page, or a custom domain.
 
+[简体中文](zh-CN/configuration.md)
+
 ## Site identity
 
 | Option | Purpose |

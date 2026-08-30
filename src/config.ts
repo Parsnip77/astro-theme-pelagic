@@ -9,11 +9,11 @@ function normalizeBasePath(value: string) {
   return `/${trimmed.replace(/^\/+|\/+$/g, '')}`
 }
 
-function resolveDeployment() {
-  const explicitSiteURL = process.env.SITE_URL?.trim()
-  const explicitBasePath = process.env.BASE_PATH?.trim()
-  const [repositoryOwner, repositoryName] = (process.env.GITHUB_REPOSITORY ?? '').split('/')
-  const isGitHubActions = process.env.GITHUB_ACTIONS === 'true'
+export function resolveDeployment(environment: NodeJS.ProcessEnv = process.env) {
+  const explicitSiteURL = environment.SITE_URL?.trim()
+  const explicitBasePath = environment.BASE_PATH?.trim()
+  const [repositoryOwner, repositoryName] = (environment.GITHUB_REPOSITORY ?? '').split('/')
+  const isGitHubActions = environment.GITHUB_ACTIONS === 'true'
 
   // Project Pages can infer their public origin and repository subpath.
   // Local builds deliberately use example.com until the owner configures a URL.
