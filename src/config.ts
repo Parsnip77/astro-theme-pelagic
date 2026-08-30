@@ -75,7 +75,7 @@ export const themeConfig: ThemeConfig = {
   },
 
   color: {
-    mode: 'auto', // light | dark | auto
+    mode: 'light', // light | dark | auto
     light: {
       primary: 'oklch(0.24 0.0172 280.05)',
       secondary: 'oklch(0.40 0.0172 280.05)',
