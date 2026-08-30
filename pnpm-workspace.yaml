@@ -1,0 +1,12 @@
+shellEmulator: true
+verifyDepsBeforeRun: false
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - simple-git-hooks
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  simple-git-hooks: true

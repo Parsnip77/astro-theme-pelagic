@@ -1,0 +1,47 @@
+<script>
+const timeoutMap = new WeakMap<Element, number>()
+
+async function handleCodeCopyClick(e: MouseEvent) {
+  if (!(e.target instanceof Element)) {
+    return
+  }
+
+  const button = e.target.closest('.code-copy-button')
+  if (!button) {
+    return
+  }
+
+  const text = button.parentElement?.querySelector('pre > code')?.textContent
+  if (!text) {
+    return
+  }
+
+  // Copy text to clipboard
+  try {
+    await navigator.clipboard.writeText(text)
+  }
+  catch (error) {
+    console.error('[CodeCopyButton] Failed to copy:', error)
+    return
+  }
+
+  // Add copied state
+  button.classList.add('copied')
+
+  // Clear existing timeout to prevent state flickering
+  const existingTimeout = timeoutMap.get(button)
+  if (existingTimeout) {
+    clearTimeout(existingTimeout)
+  }
+
+  // Reset state after 1.5s
+  const timeoutId = window.setTimeout(() => {
+    button.classList.remove('copied')
+    timeoutMap.delete(button)
+  }, 1500)
+
+  timeoutMap.set(button, timeoutId)
+}
+
+document.addEventListener('click', handleCodeCopyClick)
+</script>

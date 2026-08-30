@@ -1,0 +1,145 @@
+html {
+  --at-apply: 'bg-background c-secondary antialiased';
+  --post-column-half-width: 25rem;
+  /* Half of the 50rem article + 4.5rem gap + 16rem TOC desktop group. */
+  --post-layout-half-width: 35.25rem;
+  /* Positive values move the article+TOC group right, while the article remains left of viewport center. */
+  --post-layout-shift: 6rem;
+  --post-toc-gap: 4.5rem;
+  --post-toc-width: 16rem;
+  --post-topbar-inset: max(2rem, 5vw);
+  --toc-accent: oklch(0.61 0.17 248);
+  scrollbar-width: thin;
+  scrollbar-color: oklch(var(--un-preset-theme-colors-secondary) / 0.25) transparent;
+  scrollbar-gutter: stable;
+  text-autospace: normal;
+}
+
+html.dark {
+  --toc-accent: oklch(0.78 0.12 248);
+}
+
+/* Fix Flash Issue On iOS */
+body {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+body::selection {
+  --at-apply: 'bg-highlight';
+}
+
+/* Highlight Hover Animation >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+.highlight-static,
+.highlight-hover {
+  --at-apply: 'relative inline-block';
+}
+.highlight-static::after,
+.highlight-hover::after {
+  --at-apply: 'absolute left-0 z--1 h-0.5em w-full bg-highlight';
+  content: '';
+}
+.highlight-static::after,
+.highlight-hover:hover::after {
+  --at-apply: 'origin-bottom-left scale-x-100';
+}
+.highlight-hover::after {
+  --at-apply: 'origin-bottom-right scale-x-0 transition-transform ease-out lg:duration-300';
+}
+
+/* Heading Anchor Link >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+.heading-anchor-link {
+  --at-apply: 'inline-block translate-y-0.1em';
+}
+h1:hover .heading-anchor-link svg,
+h2:hover .heading-anchor-link svg,
+h3:hover .heading-anchor-link svg,
+h4:hover .heading-anchor-link svg {
+  --at-apply: 'op-40';
+}
+.heading-anchor-link svg {
+  --at-apply: 'ml-0.4em aspect-square w-0.9em op-0 transition-opacity ease-out active:scale-90';
+}
+h1:hover .heading-anchor-link svg:hover,
+h2:hover .heading-anchor-link svg:hover,
+h3:hover .heading-anchor-link svg:hover,
+h4:hover .heading-anchor-link svg:hover {
+  --at-apply: 'op-80';
+}
+
+/* Image Zoom >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+.zoom-overlay {
+  --at-apply: 'fixed left-0 top-0 z-999 hidden h-full w-full cursor-zoom-out bg-background/95 op-0 transition-opacity duration-300';
+}
+.zoom-img {
+  --at-apply: 'fixed z-1000 cursor-zoom-out transition-transform duration-300';
+}
+
+/* Code Copy Button >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+.code-copy-button {
+  --at-apply: 'absolute right-2.2 top-2.2 z-99 grid aspect-square w-8 cursor-pointer place-items-center uno-round-border';
+  --at-apply: 'border-secondary/15 bg-background c-secondary/80 op-0 hover:(border-primary/15 c-primary/80)';
+  transition: opacity 0.15s ease-out, background-color 0.15s ease-out;
+}
+.code-block-wrapper:hover .code-copy-button {
+  --at-apply: 'op-100';
+}
+.icon-copy,
+.icon-check {
+  --at-apply: '[grid-area:1/1] aspect-square w-50%';
+}
+.icon-check {
+  --at-apply: 'op-0';
+}
+.code-copy-button.copied {
+  --at-apply: 'border-none bg-emerald-600 c-background';
+}
+html.dark .code-copy-button.copied {
+  --at-apply: 'bg-emerald-500';
+}
+.code-copy-button.copied .icon-copy {
+  --at-apply: 'op-0';
+}
+.code-copy-button.copied .icon-check {
+  --at-apply: 'op-100';
+}
+/* Article pages use a wide reading column; desktop TOC geometry is applied below. */
+.post-page-shell {
+  max-width: calc(var(--post-column-half-width) + var(--post-column-half-width));
+  margin-inline: auto;
+}
+.post-topbar-spacer {
+  height: 1.85rem;
+  margin-bottom: 3.5rem;
+}
+.post-topbar {
+  position: absolute;
+  right: var(--post-topbar-inset);
+  top: 2rem;
+  max-width: calc(100vw - var(--post-topbar-inset) - var(--post-topbar-inset));
+}
+
+@media (min-width: 640px) {
+  .post-topbar-spacer {
+    margin-bottom: 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .post-topbar {
+    top: 3.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .post-page-shell {
+    margin-left: max(3.25rem, calc(50vw - var(--post-layout-half-width) + var(--post-layout-shift)));
+    margin-right: 0;
+  }
+
+  .post-page-toc {
+    position: fixed;
+    right: max(2rem, calc(50vw - var(--post-layout-half-width) - var(--post-layout-shift)));
+    top: var(--toc-top, 9.75rem);
+    width: var(--post-toc-width);
+  }
+}

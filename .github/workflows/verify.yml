@@ -1,0 +1,53 @@
+name: Verify source
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, build, and layout regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify source and generated site
+        run: pnpm verify
+
+      - name: Upload layout screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: layout-regression-${{ github.run_number }}
+          path: |
+            artifacts/playwright
+            artifacts/playwright-report
+          if-no-files-found: ignore
+          retention-days: 7

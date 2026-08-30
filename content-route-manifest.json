@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "lang": "en",
+      "slug": "attention-and-finitude"
+    },
+    {
+      "lang": "zh",
+      "slug": "attention-and-finitude"
+    },
+    {
+      "lang": "en",
+      "slug": "spectral-graph-diffusion"
+    },
+    {
+      "lang": "zh",
+      "slug": "spectral-graph-diffusion"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Pelagic wave mark</title>
+  <g fill="none" stroke="#287fc2" stroke-linecap="round" stroke-width="5">
+    <path d="M8 22c8 0 8-6 16-6s8 6 16 6 8-6 16-6"/>
+    <path d="M8 34c8 0 8-6 16-6s8 6 16 6 8-6 16-6"/>
+    <path d="M8 46c8 0 8-6 16-6s8 6 16 6 8-6 16-6"/>
+  </g>
+</svg>

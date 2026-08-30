@@ -1,0 +1,167 @@
+---
+import type { Language } from '@/i18n/config'
+import katexCSS from 'katex/dist/katex.min.css?url'
+import { allLocales, base, defaultLocale, themeConfig } from '@/config'
+import { getLocalizedPath, getNextLangPath } from '@/i18n/path'
+import { ui } from '@/i18n/ui'
+import { getPageInfo } from '@/utils/page'
+
+interface Props {
+  postTitle?: string
+  postDescription?: string
+  postSlug?: string
+  supportedLangs?: Language[]
+}
+
+// Props and Language
+const { postTitle, postDescription, postSlug, supportedLangs = [] } = Astro.props
+const { currentLang, isHome, isPost, isTag, isAbout } = getPageInfo(Astro.url.pathname)
+const currentUI = ui[currentLang as keyof typeof ui] ?? {}
+
+// Site Configuration
+const { title, subtitle, description, i18nTitle, author, favicon } = themeConfig.site
+const { mode: defaultMode, light: { background: lightMode }, dark: { background: darkMode } } = themeConfig.color
+const { katex: katexEnabled, reduceMotion } = themeConfig.global
+
+// Site Metadata
+const metaTheme = defaultMode === 'dark' ? darkMode : lightMode
+const siteTitle = i18nTitle ? currentUI.title : title
+// Keep visual line breaks out of the browser tab title and social metadata.
+const siteSubtitle = (i18nTitle ? currentUI.subtitle : subtitle).replace(/\s*\n\s*/g, ' ')
+const siteDescription = i18nTitle ? currentUI.description : description
+
+// Page Metadata
+const pageTitle = postTitle ? `${postTitle} | ${siteTitle}` : `${siteTitle} - ${siteSubtitle}`
+const pageDescription = postDescription || siteDescription
+const pageImage = postSlug
+  ? new URL(`${base}/og/${postSlug}.png`, Astro.url.origin)
+  : new URL(`${base}/icons/favicon.png`, Astro.url.origin)
+const canonicalURL = new URL(Astro.url.pathname, themeConfig.site.url)
+
+// Only emit alternates for routes that actually have localized counterparts.
+// Posts and tag detail pages pass their supported language subset through Layout.
+const isLocalizedPage = isHome || isPost || isTag || isAbout
+const alternateLangs = isLocalizedPage
+  ? (supportedLangs.length > 0 ? supportedLangs : allLocales)
+  : []
+const localizedAlternates = alternateLangs.map(lang => ({
+  lang,
+  href: new URL(
+    getNextLangPath(Astro.url.pathname, currentLang, lang),
+    themeConfig.site.url,
+  ).href,
+}))
+const defaultAlternate = localizedAlternates.find(({ lang }) => lang === defaultLocale)
+const localizedRSS = new URL(
+  getLocalizedPath('/rss.xml', currentLang).replace(/\/$/, ''),
+  themeConfig.site.url,
+)
+const localizedAtom = new URL(
+  getLocalizedPath('/atom.xml', currentLang).replace(/\/$/, ''),
+  themeConfig.site.url,
+)
+---
+
+<head>
+<!-- Basic Info -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+{favicon.toLowerCase().endsWith('.svg') && <link rel="icon" type="image/svg+xml" href={`${base}${favicon}`} />}
+{favicon.toLowerCase().endsWith('.png') && <link rel="icon" type="image/png" href={`${base}${favicon}`} />}
+{favicon.toLowerCase().endsWith('.ico') && <link rel="icon" type="image/x-icon" href={`${base}${favicon}`} />}
+<link rel="apple-touch-icon" sizes="180x180" href={`${base}/apple-touch-icon.png`} />
+<title>{pageTitle}</title>
+<meta name="description" content={pageDescription} />
+<meta name="author" content={author} />
+<meta name="generator" content={Astro.generator} />
+<meta name="theme-color" content={metaTheme} />
+
+<!-- Preload -->
+<link rel="preload" href={`${base}/fonts/EarlySummer-VF-Split/EarlySummer-VF-Subset.woff2`} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={`${base}/fonts/STIX-VF.woff2`} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={`${base}/fonts/STIX-Italic-VF.woff2`} as="font" type="font/woff2" crossorigin />
+{katexEnabled && <link rel="stylesheet" href={katexCSS} media="print" onload={`this.media='all'`} />}
+
+<!-- Site Links -->
+<link rel="canonical" href={canonicalURL} />
+<link rel="sitemap" href={`${base}/sitemap-index.xml`} />
+<link rel="alternate" href={localizedRSS} type="application/rss+xml" title="RSS Feed" />
+<link rel="alternate" href={localizedAtom} type="application/atom+xml" title="Atom Feed" />
+{localizedAlternates.map(({ lang, href }) => (
+  <link
+    rel="alternate"
+    href={href}
+    hreflang={lang === 'zh-tw' ? 'zh-TW' : lang}
+  />
+))}
+{defaultAlternate && <link rel="alternate" href={defaultAlternate.href} hreflang="x-default" />}
+
+<!-- Open Graph -->
+<meta property="og:type" content={postTitle ? 'article' : 'website'} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={pageDescription} />
+<meta property="og:image" content={pageImage} />
+<meta name="twitter:card" content="summary_large_image" />
+
+<!-- Theme Toggle -->
+<script
+  is:inline
+  define:vars={{
+    defaultMode,
+    lightMode,
+    darkMode,
+    reduceMotion,
+ }}
+>
+(function () {
+  // Check if current theme is dark
+  // Priority: localStorage theme > default theme > system preference
+  function isCurrentDark() {
+    const currentTheme = localStorage.getItem('theme')
+    if (currentTheme) {
+      return currentTheme === 'dark'
+    }
+
+    if (defaultMode !== 'auto') {
+      return defaultMode === 'dark'
+    }
+
+    // If defaultMode is auto, follow system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  }
+
+  // Initialize theme
+  function initTheme(doc = document) {
+    const isDark = isCurrentDark()
+    doc.documentElement.classList.toggle('dark', isDark)
+
+    // Update meta theme-color tag
+    const metaThemeColor = doc.head.querySelector('meta[name="theme-color"]')
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', isDark ? darkMode : lightMode)
+    }
+  }
+
+  // Check and init motion preference
+  // Condition: theme config || system preference || browser capability
+  function initMotionPref(doc = document) {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const supportsViewTransitions = 'startViewTransition' in doc
+    const shouldReduceMotion = reduceMotion || prefersReducedMotion || !supportsViewTransitions
+
+    doc.documentElement.classList.toggle('reduce-motion', shouldReduceMotion)
+  }
+
+  // Update theme before page transition to prevent flashing
+  document.addEventListener('astro:before-swap', ({ newDocument }) => {
+    initTheme(newDocument)
+    initMotionPref(newDocument)
+  })
+
+  // Initialize theme on first load
+  initTheme()
+  initMotionPref()
+})()
+</script>
+</head>

@@ -1,0 +1,208 @@
+---
+import type { MarkdownHeading } from 'astro'
+import { ui } from '@/i18n/ui'
+import { getPageInfo } from '@/utils/page'
+
+interface Props {
+  headings: MarkdownHeading[]
+}
+
+interface TocSection {
+  heading: MarkdownHeading
+  children: MarkdownHeading[]
+}
+
+const { currentLang } = getPageInfo(Astro.url.pathname)
+const currentUI = ui[currentLang as keyof typeof ui] ?? {}
+const { headings = [] } = Astro.props
+const filteredHeadings = headings.filter(heading => heading.depth >= 2 && heading.depth <= 4)
+
+const sections: TocSection[] = []
+for (const heading of filteredHeadings) {
+  if (heading.depth === 2 || sections.length === 0) {
+    sections.push({ heading, children: [] })
+  }
+  else {
+    sections.at(-1)?.children.push(heading)
+  }
+}
+---
+
+{sections.length > 0 && (
+  <aside id="toc-container" class="post-page-toc no-heti" aria-label="Table of Contents">
+    <p id="toc-title">{currentUI.toc}</p>
+
+    <nav id="toc-scroll-container">
+      <div id="toc-rail" aria-hidden="true">
+        <span id="toc-progress" />
+      </div>
+
+      <ol id="toc-links-list">
+        {sections.map(section => (
+          <li class="toc-section" data-toc-section={section.heading.slug}>
+            <a
+              href={`#${section.heading.slug}`}
+              class="toc-link toc-link-h2"
+              data-toc-link={section.heading.slug}
+            >
+              {section.heading.text}
+            </a>
+
+            {section.children.length > 0 && (
+              <ol class="toc-sublist">
+                {section.children.map(heading => (
+                  <li>
+                    <a
+                      href={`#${heading.slug}`}
+                      class:list={[
+                        'toc-link toc-link-child',
+                        { 'toc-link-h4': heading.depth === 4 },
+                      ]}
+                      data-toc-link={heading.slug}
+                    >
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  </aside>
+)}
+
+<script>
+let tocTicking = false
+let tocHeadings: HTMLElement[] = []
+
+function alignArticleTOC() {
+  const toc = document.getElementById('toc-container')
+  const title = document.querySelector<HTMLElement>('.post-title > span')
+    ?? document.querySelector<HTMLElement>('.post-title')
+  if (!toc || !title) {
+    return
+  }
+
+  const titleTop = title.getBoundingClientRect().top + window.scrollY
+  toc.style.setProperty('--toc-top', `${titleTop}px`)
+}
+
+function updateArticleTOC() {
+  const toc = document.getElementById('toc-container')
+  const article = document.querySelector('article')
+  if (!toc || !article || tocHeadings.length === 0) {
+    tocTicking = false
+    return
+  }
+
+  const activationOffset = Math.min(180, window.innerHeight * 0.24)
+  let activeHeading = tocHeadings[0]
+  let activeSectionId = tocHeadings[0].id
+
+  for (const heading of tocHeadings) {
+    if (heading.getBoundingClientRect().top <= activationOffset) {
+      activeHeading = heading
+      if (heading.tagName === 'H2') {
+        activeSectionId = heading.id
+      }
+      continue
+    }
+    break
+  }
+
+  const sections = toc.querySelectorAll<HTMLElement>('[data-toc-section]')
+  sections.forEach((section) => {
+    section.classList.toggle('is-active', section.dataset.tocSection === activeSectionId)
+  })
+
+  const links = toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')
+  links.forEach((link) => {
+    const isCurrent = link.dataset.tocLink === activeHeading.id
+    link.classList.toggle('is-current', isCurrent)
+    if (isCurrent) {
+      link.setAttribute('aria-current', 'location')
+    }
+    else {
+      link.removeAttribute('aria-current')
+    }
+  })
+
+  const articleRect = article.getBoundingClientRect()
+  const articleTop = articleRect.top + window.scrollY
+  const articleBottom = articleTop + articleRect.height
+  const progressStart = articleTop
+  const progressEnd = Math.max(progressStart + 1, articleBottom - window.innerHeight * 0.7)
+  const progress = Math.min(1, Math.max(0, (window.scrollY - progressStart) / (progressEnd - progressStart)))
+  toc.style.setProperty('--toc-progress', `${progress * 100}%`)
+
+  const activeLink = toc.querySelector<HTMLElement>('.toc-link.is-current')
+  const scroller = document.getElementById('toc-scroll-container')
+  if (activeLink && scroller) {
+    const linkTop = activeLink.offsetTop
+    const linkBottom = linkTop + activeLink.offsetHeight
+    if (linkTop < scroller.scrollTop || linkBottom > scroller.scrollTop + scroller.clientHeight) {
+      scroller.scrollTo({
+        top: Math.max(0, linkTop - scroller.clientHeight * 0.35),
+        behavior: 'smooth',
+      })
+    }
+  }
+
+  tocTicking = false
+}
+
+function handleArticleTOCScroll() {
+  if (tocTicking) {
+    return
+  }
+  tocTicking = true
+  window.requestAnimationFrame(updateArticleTOC)
+}
+
+function handleArticleTOCResize() {
+  alignArticleTOC()
+  handleArticleTOCScroll()
+}
+
+function cleanupArticleTOC() {
+  document.removeEventListener('scroll', handleArticleTOCScroll)
+  window.removeEventListener('resize', handleArticleTOCResize)
+  tocHeadings = []
+  tocTicking = false
+}
+
+function setupArticleTOC() {
+  cleanupArticleTOC()
+
+  const toc = document.getElementById('toc-container')
+  if (!toc) {
+    return
+  }
+
+  const ids = new Set(
+    Array.from(toc.querySelectorAll<HTMLElement>('[data-toc-link]'))
+      .map(link => link.dataset.tocLink)
+      .filter((id): id is string => Boolean(id)),
+  )
+  tocHeadings = Array.from(document.querySelectorAll<HTMLElement>('#post-content :is(h2, h3, h4)[id]'))
+    .filter(heading => ids.has(heading.id))
+
+  alignArticleTOC()
+  updateArticleTOC()
+  document.addEventListener('scroll', handleArticleTOCScroll, { passive: true })
+  window.addEventListener('resize', handleArticleTOCResize, { passive: true })
+  void document.fonts.ready.then(alignArticleTOC)
+}
+
+document.addEventListener('astro:page-load', setupArticleTOC)
+document.addEventListener('astro:before-swap', cleanupArticleTOC)
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupArticleTOC, { once: true })
+}
+else {
+  setupArticleTOC()
+}
+</script>

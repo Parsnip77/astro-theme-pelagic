@@ -1,0 +1,43 @@
+---
+import { themeConfig } from '@/config'
+import { ui } from '@/i18n/ui'
+import { getPageInfo } from '@/utils/page'
+
+const { currentLang, getLocalizedPath } = getPageInfo(Astro.url.pathname)
+const currentUI = ui[currentLang as keyof typeof ui] ?? {}
+const { author } = themeConfig.site
+const { startYear } = themeConfig.footer
+
+const currentYear = new Date().getFullYear()
+const year = Number(startYear) === currentYear
+  ? startYear
+  : `${startYear}-${currentYear}`
+
+const navItems = [
+  { href: '/', label: currentUI.posts },
+  { href: '/tags/', label: currentUI.tags },
+  { href: '/about/', label: currentUI.about },
+]
+---
+
+<footer class="no-heti border-t border-secondary/15 pb-2 pt-5 text-3.2 c-secondary font-navbar sm:flex sm:items-center sm:justify-between sm:text-3.4">
+  <p>© {year} {author}</p>
+
+  <nav aria-label="Footer navigation" class="mt-2 sm:mt-0">
+    <div class="flex flex-wrap items-center gap-2.5">
+      {navItems.map((item, index) => (
+        <>
+          <a
+            href={getLocalizedPath(item.href)}
+            class="highlight-hover py-1 transition-colors after:bottom-0.38em hover:c-primary"
+          >
+            {item.label}
+          </a>
+          {index < navItems.length - 1 && (
+            <span aria-hidden="true" class="c-secondary/30">/</span>
+          )}
+        </>
+      ))}
+    </div>
+  </nav>
+</footer>
