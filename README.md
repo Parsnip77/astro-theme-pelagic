@@ -20,16 +20,17 @@
 
 ![Pelagic article view](docs/images/article-desktop.jpg)
 
-Pelagic keeps the home page quiet and text-only, then gives long-form posts a wider reading column, fixed corner navigation, and a responsive margin table of contents. It is a reusable derivative of [Retypeset](https://github.com/radishzzz/astro-theme-retypeset); the public defaults contain no personal content from the [live design](https://leanderc.com).
+## Design approach
 
-## Why Pelagic
+Pelagic carries forward [Retypeset](https://github.com/radishzzz/astro-theme-retypeset)'s restraint in typography and whitespace, but shifts the focus from presenting a personal blog identity to creating a depersonalized, immersive reading environment. Author-centered modules recede so that the article itself becomes the interface; the same typographic system can accommodate long-form argument, multilingual text, and annotations in the humanities and social sciences, as well as formulas, code, tables, and diagrams in the natural sciences and computer science. On article pages, the dynamic margin table of contents follows the reader's position and expands subordinate headings when needed, making long texts easier to navigate and revisit without interrupting the reading flow. The public defaults contain no personal content from the [live design](https://leanderc.com).
 
-- Typography before decoration: EB Garamond Latin titles and optional prose, balanced CJK fallbacks, and separate sizing for math and code.
-- Long-form reading: a `50rem` article column, smooth two-level margin TOC, readable tables, and horizontally scrollable diagrams.
-- Multilingual by design: English and Simplified Chinese examples, plus interface translations for 11 locales.
-- Static and private by default: no database, CMS, analytics, remote fonts, or comments unless you enable them.
-- Rich writing surface: Markdown and MDX, KaTeX, Mermaid, syntax highlighting, callouts, folds, embeds, RSS/Atom, sitemap, and generated Open Graph images.
-- Deployment-aware: root domains, GitHub user sites, and GitHub project subpaths are handled by the same source tree.
+## Highlights
+
+- **Purposeful typography:** EB Garamond Latin titles and optional prose, balanced CJK fallbacks, and independent sizing for body text, math, and code.
+- **Long-form navigation:** a wide reading column, responsive two-level margin TOC, compact corner navigation, scrollable tables and diagrams, and a focused mobile layout.
+- **One surface for essays and research:** Markdown and MDX, KaTeX, Mermaid, syntax highlighting, callouts, folds, footnotes, and media embeds.
+- **Multilingual and private by default:** English and Simplified Chinese starter content, interface translations for 11 locales, local fonts, no analytics, and optional Giscus comments.
+- **Static publishing with safeguards:** RSS/Atom, sitemap and Open Graph output, GitHub Pages root/subpath inference, content validation, generated-link checks, and responsive regression tests.
 
 ![Pelagic math, code, and Mermaid rendering](docs/images/features-desktop.jpg)
 
